@@ -1,0 +1,236 @@
+.place-order {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 50px;
+  margin-top: 50px;
+  min-height: 70vh;
+}
+
+.place-order-left {
+  width: 100%;
+  max-width: max(30%, 500px);
+}
+
+.place-order-left .title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #262626;
+}
+
+.place-order-left input {
+  margin-bottom: 15px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #c5c5c5;
+  border-radius: 4px;
+  outline-color: #FF6347;
+  font-size: 14px;
+  color: #333;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.place-order-left input:focus {
+  border-color: #FF6347;
+  box-shadow: 0 0 0 2px rgba(255, 99, 71, 0.15);
+}
+
+.place-order-left .multi-fields {
+  display: flex;
+  gap: 12px;
+}
+
+.place-order-right {
+  width: 100%;
+  max-width: max(40%, 450px);
+}
+
+.place-order-right .cart-total {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #eef0f2;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.place-order-right .cart-total button {
+  margin-top: 30px;
+  width: 100%;
+  padding: 14px 0;
+  background-color: #FF6347;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+.place-order-right .cart-total button:hover {
+  background-color: #e04b30;
+  transform: translateY(-2px);
+}
+
+.place-order-right .cart-total button:disabled {
+  background-color: #ff9d8c;
+  cursor: not-allowed;
+}
+
+.payment-badges {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: #747474;
+  font-size: 12px;
+}
+
+.payment-badges span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Simulated Razorpay Test Modal */
+.razorpay-sim-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(3px);
+}
+
+.razorpay-sim-card {
+  background: white;
+  width: 90%;
+  max-width: 440px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+.razorpay-sim-header {
+  background: #0c2340;
+  color: white;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.razorpay-sim-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.razorpay-sim-header .tag {
+  background: #3399cc;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.razorpay-sim-body {
+  padding: 24px;
+}
+
+.sim-amount-banner {
+  background: #f4f8fb;
+  border: 1px solid #dbe8f2;
+  padding: 14px 18px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sim-amount-banner span {
+  color: #555;
+  font-size: 14px;
+}
+
+.sim-amount-banner strong {
+  font-size: 22px;
+  color: #0c2340;
+}
+
+.sim-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.sim-method-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  transition: all 0.2s;
+}
+
+.sim-method-item:hover, .sim-method-item.active {
+  border-color: #3399cc;
+  background-color: #f0f7ff;
+}
+
+.sim-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.sim-btn-pay {
+  flex: 2;
+  background: #3399cc;
+  color: white;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.sim-btn-pay:hover {
+  background: #2884b2;
+}
+
+.sim-btn-cancel {
+  flex: 1;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+@media (max-width: 850px) {
+  .place-order {
+    flex-direction: column;
+  }
+  .place-order-left, .place-order-right {
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,59 @@
+.app-download {
+  margin: 100px auto 40px;
+  font-size: max(3vw, 20px);
+  text-align: center;
+  font-weight: 600;
+  color: #262626;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.app-download p {
+  line-height: 1.4;
+}
+
+.app-download-platforms {
+  display: flex;
+  justify-content: center;
+  gap: max(2vw, 15px);
+}
+
+.app-badge-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #000000;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s, box-shadow 0.25s;
+  text-align: left;
+}
+
+.app-badge-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+.app-badge-icon {
+  font-size: 26px;
+}
+
+.app-badge-text small {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+.app-badge-text strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+}

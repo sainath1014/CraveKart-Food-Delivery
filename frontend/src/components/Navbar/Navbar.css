@@ -1,0 +1,234 @@
+.navbar {
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background-color: #ffffff;
+  z-index: 100;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.navbar .logo {
+  font-size: 32px;
+  font-weight: 700;
+  color: #FF6347;
+  cursor: pointer;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.navbar .logo span {
+  color: #FF6347;
+}
+
+.navbar-menu {
+  display: flex;
+  list-style: none;
+  gap: 24px;
+  color: #49557e;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.navbar-menu li, .navbar-menu a {
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.navbar-menu li:hover, .navbar-menu a:hover {
+  color: #FF6347;
+}
+
+.navbar-menu .active {
+  padding-bottom: 3px;
+  border-bottom: 2px solid #49557e;
+  color: #262626;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.navbar-search-box {
+  display: flex;
+  align-items: center;
+  background: #f8f8f8;
+  border-radius: 20px;
+  padding: 6px 12px;
+  border: 1px solid #e2e2e2;
+  transition: all 0.2s ease;
+}
+
+.navbar-search-box:focus-within {
+  border-color: #FF6347;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(255, 99, 71, 0.15);
+}
+
+.navbar-search-box input {
+  border: none;
+  background: transparent;
+  padding-left: 8px;
+  font-size: 14px;
+  color: #333;
+  width: 130px;
+  transition: width 0.3s;
+}
+
+.navbar-search-box input:focus {
+  width: 180px;
+}
+
+.navbar-icon-btn {
+  background: none;
+  border: none;
+  color: #49557e;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.navbar-icon-btn:hover {
+  color: #FF6347;
+}
+
+.navbar-cart-icon {
+  position: relative;
+  cursor: pointer;
+  color: #49557e;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-cart-icon .cart-badge {
+  position: absolute;
+  min-width: 18px;
+  height: 18px;
+  background-color: #FF6347;
+  border-radius: 9px;
+  top: -8px;
+  right: -10px;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.navbar-signin-btn {
+  background: transparent;
+  font-size: 16px;
+  color: #49557e;
+  border: 1px solid #FF6347;
+  padding: 10px 30px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.navbar-signin-btn:hover {
+  background-color: #fff4f2;
+}
+
+.navbar-profile {
+  position: relative;
+  cursor: pointer;
+}
+
+.navbar-profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fff4f2;
+  color: #FF6347;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffd8d1;
+  font-weight: 600;
+}
+
+.nav-profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #fff2ef;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1px solid #FF6347;
+  outline: 2px solid white;
+  list-style: none;
+  min-width: 160px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 200;
+}
+
+.nav-profile-dropdown li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: #49557e;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-profile-dropdown li:hover {
+  color: #FF6347;
+}
+
+.nav-profile-dropdown hr {
+  border: none;
+  height: 1px;
+  background-color: #e2e2e2;
+  margin: 2px 0;
+}
+
+.admin-link-pill {
+  font-size: 13px;
+  padding: 4px 10px;
+  background-color: #2b2b2b;
+  color: white !important;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.admin-link-pill:hover {
+  background-color: #FF6347;
+}
+
+@media (max-width: 1050px) {
+  .navbar .logo {
+    font-size: 27px;
+  }
+  .navbar-menu {
+    gap: 16px;
+    font-size: 16px;
+  }
+  .navbar-right {
+    gap: 16px;
+  }
+  .navbar-signin-btn {
+    padding: 8px 22px;
+  }
+}
+
+@media (max-width: 800px) {
+  .navbar-menu {
+    display: none;
+  }
+}

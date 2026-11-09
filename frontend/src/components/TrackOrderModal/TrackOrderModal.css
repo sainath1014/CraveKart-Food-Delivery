@@ -1,0 +1,156 @@
+.track-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(2px);
+}
+
+.track-modal-content {
+  background: white;
+  width: 90%;
+  max-width: 580px;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.3s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.track-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.track-modal-header h3 {
+  font-size: 20px;
+  color: #262626;
+  font-weight: 700;
+}
+
+.track-stepper {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 30px 10px 40px;
+}
+
+.track-stepper::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 30px;
+  right: 30px;
+  height: 3px;
+  background-color: #e2e8f0;
+  z-index: 1;
+}
+
+.track-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.track-step-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.track-step.active .track-step-circle {
+  background-color: #FF6347;
+  color: white;
+  box-shadow: 0 0 0 4px #ffeae6;
+}
+
+.track-step.completed .track-step-circle {
+  background-color: #2e7d32;
+  color: white;
+}
+
+.track-step p {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+  max-width: 80px;
+}
+
+.track-step.active p {
+  color: #FF6347;
+}
+
+.track-step.completed p {
+  color: #2e7d32;
+}
+
+.track-details-box {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.track-details-box h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.track-details-box p {
+  font-size: 13.5px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.track-items-list {
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.track-item-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #334155;
+}
+
+.track-close-btn {
+  width: 100%;
+  background: #2b2b2b;
+  color: white;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 20px;
+  font-weight: 600;
+}
+
+.track-close-btn:hover {
+  background: #000;
+}
