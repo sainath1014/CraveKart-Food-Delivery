@@ -59,6 +59,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+try:
+    import whitenoise  # noqa: F401
+    MIDDLEWARE.insert(2, 'whitenoise.middleware.WhiteNoiseMiddleware')
+except ImportError:
+    pass
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -81,9 +87,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
-# If DATABASE_URL is defined (PostgreSQL), dj_database_url configures it; otherwise fallback to SQLite
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
+# Default to SQLite for reliable demo deployment; use external DB only if a valid DATABASE_URL is explicitly configured
+DATABASE_URL = (os.environ.get('DATABASE_URL') or '').strip()
+VALID_DB_SCHEMES = ('postgres://', 'postgresql://', 'postgis://', 'sqlite://')
+if DATABASE_URL and DATABASE_URL.startswith(VALID_DB_SCHEMES):
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
@@ -96,6 +103,9 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
+            'OPTIONS': {
+                'timeout': 20,
+            },
         }
     }
 
@@ -138,12 +148,21 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration
+from corsheaders.defaults import default_headers
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-session-key',
+]
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost:[0-9]+$",
     r"^http://127\.0\.0\.1:[0-9]+$",
 ]
+
+# Render / Reverse Proxy HTTPS support
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
@@ -158,6 +177,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

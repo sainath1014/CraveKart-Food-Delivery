@@ -1,15 +1,22 @@
+import logging
 from rest_framework import status, permissions, parsers
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.db.models import Q, Sum, Count
+from django.conf import settings
+from django.db import DatabaseError
+from django.db.models import Q
 from .models import Food
 from .serializers import FoodSerializer
 from common.permissions import IsAdminUserRole
+from common.db_bootstrap import ensure_sqlite_ready
+
+logger = logging.getLogger(__name__)
+
 
 class FoodListView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    def get(self, request):
+    def _query_foods(self, request):
         category = request.query_params.get('category')
         foods = Food.objects.filter(available=True)
         if category and category.lower() != 'all':
@@ -20,11 +27,29 @@ class FoodListView(APIView):
                 foods = foods.filter(category__iexact=category)
 
         serializer = FoodSerializer(foods, many=True, context={'request': request})
-        return Response({
-            'success': True,
-            'count': foods.count(),
-            'foods': serializer.data
-        }, status=status.HTTP_200_OK)
+        return serializer.data
+
+    def get(self, request):
+        try:
+            try:
+                food_data = self._query_foods(request)
+            except DatabaseError:
+                ensure_sqlite_ready()
+                food_data = self._query_foods(request)
+
+            return Response({
+                'success': True,
+                'count': len(food_data),
+                'foods': food_data
+            }, status=status.HTTP_200_OK)
+        except Exception as exc:
+            logger.exception("Error in FoodListView: %s", exc)
+            return Response({
+                'success': False,
+                'message': 'Failed to load food items.',
+                'error': str(exc) if settings.DEBUG else 'Internal server error'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class FoodDetailView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -34,32 +59,47 @@ class FoodDetailView(APIView):
             food = Food.objects.get(pk=pk)
         except Food.DoesNotExist:
             return Response({'success': False, 'message': 'Food item not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as exc:
+            logger.exception("Error in FoodDetailView: %s", exc)
+            return Response({
+                'success': False,
+                'message': 'Failed to load food item details.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         serializer = FoodSerializer(food, context={'request': request})
         return Response({'success': True, 'food': serializer.data}, status=status.HTTP_200_OK)
+
 
 class FoodSearchView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        query = request.query_params.get('q', '').strip()
-        if not query:
-            return Response({'success': True, 'foods': []}, status=status.HTTP_200_OK)
+        try:
+            query = request.query_params.get('q', '').strip()
+            if not query:
+                return Response({'success': True, 'foods': []}, status=status.HTTP_200_OK)
 
-        foods = Food.objects.filter(
-            available=True
-        ).filter(
-            Q(name__icontains=query) |
-            Q(description__icontains=query) |
-            Q(category__icontains=query)
-        )
-        serializer = FoodSerializer(foods, many=True, context={'request': request})
-        return Response({
-            'success': True,
-            'query': query,
-            'count': foods.count(),
-            'foods': serializer.data
-        }, status=status.HTTP_200_OK)
+            foods = Food.objects.filter(
+                available=True
+            ).filter(
+                Q(name__icontains=query) |
+                Q(description__icontains=query) |
+                Q(category__icontains=query)
+            )
+            serializer = FoodSerializer(foods, many=True, context={'request': request})
+            food_data = serializer.data
+            return Response({
+                'success': True,
+                'query': query,
+                'count': len(food_data),
+                'foods': food_data
+            }, status=status.HTTP_200_OK)
+        except Exception as exc:
+            logger.exception("Error in FoodSearchView: %s", exc)
+            return Response({
+                'success': False,
+                'message': 'Failed to search food items.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Admin Food Management Views
 class AdminFoodAddView(APIView):
@@ -121,10 +161,18 @@ class AdminFoodListView(APIView):
     permission_classes = [IsAdminUserRole]
 
     def get(self, request):
-        foods = Food.objects.all().order_by('-created_at')
-        serializer = FoodSerializer(foods, many=True, context={'request': request})
-        return Response({
-            'success': True,
-            'count': foods.count(),
-            'foods': serializer.data
-        }, status=status.HTTP_200_OK)
+        try:
+            foods = Food.objects.all().order_by('-created_at')
+            serializer = FoodSerializer(foods, many=True, context={'request': request})
+            food_data = serializer.data
+            return Response({
+                'success': True,
+                'count': len(food_data),
+                'foods': food_data
+            }, status=status.HTTP_200_OK)
+        except Exception as exc:
+            logger.exception("Error in AdminFoodListView: %s", exc)
+            return Response({
+                'success': False,
+                'message': 'Failed to load admin food list.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -16,3 +16,4 @@ razorpay>=1.4.1
 requests>=2.31.0
 sqlparse>=0.5.0
 urllib3>=2.2.0
+whitenoise>=6.6.0
