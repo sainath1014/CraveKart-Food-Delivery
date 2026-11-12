@@ -1,14 +1,19 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { foodAPI, cartAPI, authAPI } from '../services/api';
+import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
+import { foodAPI, cartAPI, authAPI, getCachedFoods } from '../services/api';
 import { toast } from 'react-toastify';
 
 export const StoreContext = createContext(null);
 
+const COLD_START_BANNER_DELAY_MS = 4000;
+
 export const StoreContextProvider = ({ children }) => {
-  const [foodList, setFoodList] = useState([]);
+  const [foodList, setFoodList] = useState(() => getCachedFoods()?.foods || []);
+  const foodListRef = useRef([]);
+  const [loadingFoods, setLoadingFoods] = useState(() => (getCachedFoods()?.foods?.length || 0) === 0);
+  const [foodError, setFoodError] = useState(null);
+  const [backendWakingUp, setBackendWakingUp] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [cartDetails, setCartDetails] = useState({ subtotal: '0.00', item_count: 0, items: [] });
-  const [loadingFoods, setLoadingFoods] = useState(true);
 
   // Authentication states
   const [token, setToken] = useState(localStorage.getItem('cravekart_user_token') || '');
@@ -24,18 +29,42 @@ export const StoreContextProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [promoCode, setPromoCode] = useState(null);
 
-  // 1. Fetch Food List from backend
-  const fetchFoodList = useCallback(async () => {
-    try {
+  // 1. Fetch Food List from backend with caching, deduplication, and cold-start feedback
+  const fetchFoodList = useCallback(async ({ force = true, silent = false } = {}) => {
+    let wakeTimer = null;
+
+    if (!silent) {
       setLoadingFoods(true);
-      const res = await foodAPI.getFoods();
-      if (res.data && res.data.foods) {
+      setFoodError(null);
+      setBackendWakingUp(false);
+      wakeTimer = setTimeout(() => {
+        setBackendWakingUp(true);
+      }, COLD_START_BANNER_DELAY_MS);
+    }
+
+    try {
+      const res = await foodAPI.getFoods(undefined, { force });
+      if (res.data && Array.isArray(res.data.foods)) {
+        foodListRef.current = res.data.foods;
         setFoodList(res.data.foods);
+        setFoodError(null);
       }
     } catch (err) {
       console.error('Failed to fetch food items:', err);
+      const isTimeout = err.code === 'ECONNABORTED' || (err.message && err.message.toLowerCase().includes('timeout'));
+      const friendlyMsg = isTimeout
+        ? 'The server took too long to respond while waking up. Please try again.'
+        : err.response?.data?.message || 'Unable to load menu right now. Please check your connection and retry.';
+
+      if (!silent || foodListRef.current.length === 0) {
+        setFoodError(friendlyMsg);
+      }
     } finally {
-      setLoadingFoods(false);
+      if (wakeTimer) clearTimeout(wakeTimer);
+      if (!silent) {
+        setLoadingFoods(false);
+        setBackendWakingUp(false);
+      }
     }
   }, []);
 
@@ -77,12 +106,26 @@ export const StoreContextProvider = ({ children }) => {
     }
   }, [token]);
 
-  // Initial loads
   useEffect(() => {
-    fetchFoodList();
+    foodListRef.current = foodList;
+  }, [foodList]);
+
+  // Initial food & cart load (runs once on mount, avoids duplicate refetches on token changes)
+  useEffect(() => {
+    const cache = getCachedFoods();
+    if (!cache || cache.foods.length === 0) {
+      fetchFoodList({ force: false, silent: false });
+    } else if (!cache.isFresh) {
+      // Cached menu is already rendered; refresh silently in background
+      fetchFoodList({ force: true, silent: true });
+    }
     fetchCart();
+  }, [fetchFoodList, fetchCart]);
+
+  // Fetch profile only when user token changes
+  useEffect(() => {
     fetchUserProfile();
-  }, [fetchFoodList, fetchCart, fetchUserProfile]);
+  }, [fetchUserProfile]);
 
   // Add to Cart
   const addToCart = async (foodId) => {
@@ -206,6 +249,8 @@ export const StoreContextProvider = ({ children }) => {
   const contextValue = {
     foodList,
     loadingFoods,
+    foodError,
+    backendWakingUp,
     fetchFoodList,
     cartItems,
     cartDetails,

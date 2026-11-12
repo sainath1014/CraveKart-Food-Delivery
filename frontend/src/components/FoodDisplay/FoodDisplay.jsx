@@ -2,9 +2,22 @@ import React, { useContext } from 'react';
 import './FoodDisplay.css';
 import { StoreContext } from '../../context/StoreContext';
 import FoodItem from '../FoodItem/FoodItem';
+import { Clock, RefreshCw, AlertCircle } from 'lucide-react';
+
+const SKELETON_COUNT = 8;
 
 const FoodDisplay = () => {
-  const { foodList, loadingFoods, category, searchQuery, setSearchQuery, setCategory } = useContext(StoreContext);
+  const {
+    foodList,
+    loadingFoods,
+    foodError,
+    backendWakingUp,
+    fetchFoodList,
+    category,
+    searchQuery,
+    setSearchQuery,
+    setCategory,
+  } = useContext(StoreContext);
 
   // Filter foods by Category and Search Query
   const filteredFoods = foodList.filter((item) => {
@@ -30,9 +43,50 @@ const FoodDisplay = () => {
     <div className="food-display" id="food-display">
       <h2>Top dishes near you</h2>
 
-      {loadingFoods ? (
-        <div className="food-loading-skeleton">
-          <p>Loading mouthwatering dishes from CraveKart kitchen...</p>
+      {loadingFoods && foodList.length === 0 ? (
+        <div className="food-loading-container" aria-busy="true" aria-live="polite">
+          {backendWakingUp && (
+            <div className="food-wakeup-banner">
+              <Clock size={18} className="wakeup-icon" />
+              <div className="wakeup-text">
+                <strong>Waking up CraveKart&apos;s kitchen server...</strong>
+                <span>
+                  Our backend runs on Render Free tier, so the first load after inactivity can take 30–40 seconds. Your menu will appear automatically.
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div className="food-display-list">
+            {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+              <div className="food-skeleton-card" key={index}>
+                <div className="skeleton-shimmer skeleton-img" />
+                <div className="food-skeleton-info">
+                  <div className="food-skeleton-header">
+                    <div className="skeleton-shimmer skeleton-title" />
+                    <div className="skeleton-shimmer skeleton-stars" />
+                  </div>
+                  <div className="skeleton-shimmer skeleton-line" />
+                  <div className="skeleton-shimmer skeleton-line short" />
+                  <div className="skeleton-shimmer skeleton-price" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : foodError && foodList.length === 0 ? (
+        <div className="food-error-state" role="alert">
+          <AlertCircle size={36} color="#FF6347" />
+          <h3>Could not load the menu</h3>
+          <p>{foodError}</p>
+          <button
+            type="button"
+            className="food-retry-btn"
+            onClick={() => fetchFoodList({ force: true, silent: false })}
+          >
+            <RefreshCw size={16} />
+            Retry Loading Menu
+          </button>
         </div>
       ) : filteredFoods.length === 0 ? (
         <div className="food-display-empty">
