@@ -27,7 +27,16 @@ export const StoreContextProvider = ({ children }) => {
   const [loginState, setLoginState] = useState('Login'); // 'Login' or 'Sign Up'
   const [category, setCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchTrigger, setSearchTrigger] = useState(0);
   const [promoCode, setPromoCode] = useState(null);
+
+  const triggerSearchScroll = useCallback(() => {
+    setSearchTrigger((prev) => prev + 1);
+  }, []);
+
+  const clearSearchScroll = useCallback(() => {
+    setSearchTrigger(0);
+  }, []);
 
   // 1. Fetch Food List from backend with caching, deduplication, and cold-start feedback
   const fetchFoodList = useCallback(async ({ force = true, silent = false } = {}) => {
@@ -276,6 +285,9 @@ export const StoreContextProvider = ({ children }) => {
     setCategory,
     searchQuery,
     setSearchQuery,
+    searchTrigger,
+    triggerSearchScroll,
+    clearSearchScroll,
     promoCode,
     setPromoCode,
   };

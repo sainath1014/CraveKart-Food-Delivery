@@ -36,7 +36,18 @@ const Footer = () => {
         <div className="footer-content-center">
           <h2>COMPANY</h2>
           <ul>
-            <li><Link to="/">Home</Link></li>
+            <li>
+              <Link
+                to="/"
+                onClick={() => {
+                  setTimeout(() => {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                  }, 50);
+                }}
+              >
+                Home
+              </Link>
+            </li>
             <li>About us</li>
             <li>Delivery</li>
             <li>Privacy policy</li>

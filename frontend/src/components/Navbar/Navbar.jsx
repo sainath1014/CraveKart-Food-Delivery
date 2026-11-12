@@ -7,11 +7,22 @@ import { Search, ShoppingBag, User as UserIcon, Package, LogOut, Shield } from '
 const Navbar = () => {
   const [menu, setMenu] = useState('home');
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
-  const { getTotalCartCount, token, user, handleUserLogout, setShowLogin, setLoginState, searchQuery, setSearchQuery } = useContext(StoreContext);
+  const {
+    getTotalCartCount,
+    token,
+    user,
+    handleUserLogout,
+    setShowLogin,
+    setLoginState,
+    searchQuery,
+    setSearchQuery,
+    triggerSearchScroll,
+    clearSearchScroll,
+  } = useContext(StoreContext);
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -24,7 +35,22 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleHomeClick = (e) => {
+    if (e) e.preventDefault();
+    clearSearchScroll();
+    setMenu('home');
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      }, 60);
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+  };
+
   const handleNavClick = (sectionId, menuName) => {
+    clearSearchScroll();
     setMenu(menuName);
     if (location.pathname !== '/') {
       navigate('/');
@@ -38,14 +64,26 @@ const Navbar = () => {
     }
   };
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) {
+      searchInputRef.current?.focus();
+      return;
+    }
+    if (location.pathname !== '/') {
+      navigate('/');
+    }
+    triggerSearchScroll();
+  };
+
   return (
     <div className="navbar">
-      <Link to="/" onClick={() => setMenu('home')}>
+      <Link to="/" onClick={handleHomeClick}>
         <div className="logo">CraveKart<span>.</span></div>
       </Link>
 
       <ul className="navbar-menu">
-        <li onClick={() => { setMenu('home'); navigate('/'); }} className={menu === 'home' && location.pathname === '/' ? 'active' : ''}>
+        <li onClick={handleHomeClick} className={menu === 'home' && location.pathname === '/' ? 'active' : ''}>
           home
         </li>
         <li onClick={() => handleNavClick('explore-menu', 'menu')} className={menu === 'menu' ? 'active' : ''}>
@@ -61,9 +99,17 @@ const Navbar = () => {
 
       <div className="navbar-right">
         {/* Search Input Bar */}
-        <div className="navbar-search-box">
-          <Search size={18} color="#49557e" />
+        <form className="navbar-search-box" onSubmit={handleSearchSubmit}>
+          <button
+            type="submit"
+            className="navbar-search-btn"
+            aria-label="Search food"
+            title="Search food"
+          >
+            <Search size={18} />
+          </button>
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Search food..."
             value={searchQuery}
@@ -72,7 +118,7 @@ const Navbar = () => {
               if (location.pathname !== '/') navigate('/');
             }}
           />
-        </div>
+        </form>
 
         {/* Cart Icon */}
         <div className="navbar-cart-icon" onClick={() => navigate('/cart')}>

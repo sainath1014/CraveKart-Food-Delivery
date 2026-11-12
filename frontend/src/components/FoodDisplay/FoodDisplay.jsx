@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import './FoodDisplay.css';
 import { StoreContext } from '../../context/StoreContext';
 import FoodItem from '../FoodItem/FoodItem';
@@ -17,7 +17,13 @@ const FoodDisplay = () => {
     searchQuery,
     setSearchQuery,
     setCategory,
+    searchTrigger,
+    clearSearchScroll,
   } = useContext(StoreContext);
+
+  const sectionRef = useRef(null);
+  const firstResultRef = useRef(null);
+  const emptyStateRef = useRef(null);
 
   // Filter foods by Category and Search Query
   const filteredFoods = foodList.filter((item) => {
@@ -39,8 +45,41 @@ const FoodDisplay = () => {
     return categoryMatch && searchMatch;
   });
 
+  // Smooth-scroll to rendered search results (or empty message) once results are painted
+  useEffect(() => {
+    if (!searchTrigger) return undefined;
+
+    let rafId = null;
+    if (loadingFoods && foodList.length === 0) {
+      rafId = requestAnimationFrame(() => {
+        sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      return () => {
+        if (rafId) cancelAnimationFrame(rafId);
+      };
+    }
+
+    rafId = requestAnimationFrame(() => {
+      const targetEl =
+        filteredFoods.length > 0
+          ? firstResultRef.current
+          : foodError && foodList.length === 0
+            ? sectionRef.current
+            : emptyStateRef.current;
+
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      clearSearchScroll();
+    });
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [searchTrigger, loadingFoods, foodList.length, filteredFoods.length, foodError, clearSearchScroll]);
+
   return (
-    <div className="food-display" id="food-display">
+    <div className="food-display" id="food-display" ref={sectionRef}>
       <h2>Top dishes near you</h2>
 
       {loadingFoods && foodList.length === 0 ? (
@@ -89,7 +128,7 @@ const FoodDisplay = () => {
           </button>
         </div>
       ) : filteredFoods.length === 0 ? (
-        <div className="food-display-empty">
+        <div className="food-display-empty" ref={emptyStateRef}>
           <h3>No matching food items found</h3>
           <p>
             {searchQuery
@@ -107,7 +146,7 @@ const FoodDisplay = () => {
         </div>
       ) : (
         <div className="food-display-list">
-          {filteredFoods.map((item) => (
+          {filteredFoods.map((item, index) => (
             <FoodItem
               key={item.id}
               id={item.id}
@@ -116,6 +155,7 @@ const FoodDisplay = () => {
               price={item.price}
               image={item.display_image || item.image_url}
               rating={item.rating}
+              cardRef={index === 0 ? firstResultRef : null}
             />
           ))}
         </div>

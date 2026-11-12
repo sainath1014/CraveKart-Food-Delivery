@@ -3,7 +3,7 @@ import './FoodItem.css';
 import { StoreContext } from '../../context/StoreContext';
 import { Star, Plus, Minus } from 'lucide-react';
 
-const FoodItem = ({ id, name, price, description, image, rating }) => {
+const FoodItem = ({ id, name, price, description, image, rating, cardRef }) => {
   const { cartItems, addToCart, removeFromCart } = useContext(StoreContext);
   const itemCount = cartItems[id] || 0;
 
@@ -25,7 +25,7 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
   };
 
   return (
-    <div className="food-item">
+    <div className="food-item" ref={cardRef}>
       <div className="food-item-img-container">
         <img
           className="food-item-image"
